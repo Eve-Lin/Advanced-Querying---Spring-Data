@@ -3,6 +3,7 @@ package eu.evelin.demo;
 import eu.evelin.demo.dao.IngredientRepository;
 import eu.evelin.demo.dao.LabelRepository;
 import eu.evelin.demo.dao.ShampooRepository;
+import eu.evelin.demo.entities.Label;
 import eu.evelin.demo.entities.Size;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
@@ -27,5 +28,13 @@ public class AppInitializer implements ApplicationRunner {
     public void run(ApplicationArguments args) throws Exception {
 shampooRepo.findBySize(Size.MEDIUM)
         .forEach(sh -> System.out.printf("%s %s %s %.2f%n",sh.getBrand(), sh.getLabel().getTitle(), sh.getSize(),sh.getPrice()));
-    }
+
+        Label label = labelRepo.findOneById(1);
+    shampooRepo.findAllBySizeOrLabelOrderByPriceAsc(Size.MEDIUM, label)
+                .forEach(sh -> System.out.printf("%s %s %s %.2f%n",sh.getBrand(), sh.getLabel().getTitle(), sh.getSize(),sh.getPrice()));
+
+        System.out.println("A list of the shampoos with price greater than 5");
+        shampooRepo.findByPriceGreaterThanOrderByPriceDesc(5)
+                .forEach(sh -> System.out.printf("%s %s %s %.2f%n",sh.getBrand(), sh.getLabel().getTitle(), sh.getSize(),sh.getPrice()));
+}
 }
