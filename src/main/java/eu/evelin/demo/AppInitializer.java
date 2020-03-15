@@ -5,10 +5,14 @@ import eu.evelin.demo.dao.LabelRepository;
 import eu.evelin.demo.dao.ShampooRepository;
 import eu.evelin.demo.entities.Ingredient;
 import eu.evelin.demo.entities.Label;
+import eu.evelin.demo.entities.Shampoo;
 import eu.evelin.demo.entities.Size;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -53,5 +57,21 @@ public class AppInitializer implements ApplicationRunner {
                 .forEach(sh -> System.out.printf("%s %s %s %.2f %s%n",
                         sh.getBrand(), sh.getSize(), sh.getLabel().getTitle(), sh.getPrice(),
                         sh.getIngredients().stream().map(Ingredient::getName).collect(Collectors.toList())));
+
+        System.out.println("Update prices");
+        ingredientRepo.updatePriceIngredientsInListBy10Percent(List.of("Lavender", "Herbs", "Apple"));
+
+
+        Page<Shampoo> page;
+        Pageable pageable = PageRequest.of(0, 5);
+        do {
+            page = shampooRepo.findAll(pageable);
+            System.out.printf("Page %d of %d:%n------------------%n", page.getNumber() + 1, page.getTotalPages());
+            page.forEach(s -> System.out.printf("%s %s %s %.2f %s%n",
+                    s.getBrand(), s.getSize(), s.getLabel().getTitle(), s.getPrice(),
+                    s.getIngredients().stream().map(Ingredient::getName).collect(Collectors.toList())));
+            pageable = pageable.next();
+        } while (page.hasNext());
     }
 }
+
